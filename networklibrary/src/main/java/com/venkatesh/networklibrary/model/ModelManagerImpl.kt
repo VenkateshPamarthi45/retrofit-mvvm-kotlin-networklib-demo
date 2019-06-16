@@ -18,6 +18,8 @@ internal class ModelManagerImpl(private val lruCacheManager: LruCacheManager, pr
                     if(response.body() != null){
                         lruCacheManager.putEntry(url, response.body()!!)
                     }
+                }else{
+                    closure(response, null, call)
                 }
             }
         }else{
