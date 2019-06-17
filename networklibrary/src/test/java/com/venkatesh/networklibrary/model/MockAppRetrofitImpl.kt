@@ -16,6 +16,10 @@ import retrofit2.converter.gson.GsonConverterFactory
 class MockAppRetrofitImpl:AppRetrofit {
 
     var isGetApiCalled = false
+    var isPostApiCalled = false
+    var isPutApiCalled = false
+    var isPatchApiCalled = false
+    var isDeleteApiCalled = false
 
     override fun getApiRequest(
         url: String,
@@ -36,7 +40,7 @@ class MockAppRetrofitImpl:AppRetrofit {
         requestBody: RequestBody,
         closure: (response: Response<ResponseBody>?, call: Deferred<Response<ResponseBody>>) -> Unit
     ) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        isPostApiCalled = true
     }
 
     override fun putApiRequest(
@@ -44,7 +48,7 @@ class MockAppRetrofitImpl:AppRetrofit {
         requestBody: RequestBody,
         closure: (response: Response<ResponseBody>?, call: Deferred<Response<ResponseBody>>) -> Unit
     ) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        isPutApiCalled = true
     }
 
     override fun patchApiRequest(
@@ -52,13 +56,13 @@ class MockAppRetrofitImpl:AppRetrofit {
         requestBody: RequestBody,
         closure: (response: Response<ResponseBody>?, call: Deferred<Response<ResponseBody>>) -> Unit
     ) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        isPatchApiCalled = true
     }
 
     override fun deleteApiRequest(
         url: String,
         closure: (response: Response<ResponseBody>?, call: Deferred<Response<ResponseBody>>) -> Unit
     ) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        isDeleteApiCalled = true
     }
 }
