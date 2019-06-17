@@ -14,6 +14,10 @@ import org.kodein.di.generic.instance
 import org.kodein.di.generic.provider
 import org.kodein.di.generic.singleton
 
+/**
+ * Class helps to create dependency injection
+ * @property kodein LazyKodein
+ */
 class AppApplication: Application(), KodeinAware {
 
     override val kodein by Kodein.lazy {

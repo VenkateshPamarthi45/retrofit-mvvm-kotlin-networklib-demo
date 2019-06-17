@@ -4,7 +4,12 @@ import com.venkatesh.networklibrary.lrucache.LruCacheManager
 import okhttp3.ResponseBody
 import okio.Buffer
 
-
+/**
+ * Class helps to mock LruCacheManagerImpl
+ * @property isGetMethodCalled Boolean helps to get data if get method is called
+ * @property isPutMethodCalled Boolean helps to get data if put method is called
+ * @property isCacheAvailable Boolean helps to get data if cache data is available
+ */
 class MockLruCacheManagerImpl:LruCacheManager {
 
     var isGetMethodCalled  = false
@@ -26,6 +31,6 @@ class MockLruCacheManagerImpl:LruCacheManager {
     }
 
     override fun getSnapShotOfCache(): String {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return "sample snapshot"
     }
 }

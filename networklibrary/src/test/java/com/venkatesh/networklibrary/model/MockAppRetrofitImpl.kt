@@ -3,7 +3,6 @@ package com.venkatesh.networklibrary.model
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.venkatesh.networklibrary.api.ApiService
 import com.venkatesh.networklibrary.api.AppRetrofit
-import com.venkatesh.networklibrary.api.AppRetrofitImpl
 import kotlinx.coroutines.Deferred
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
@@ -13,6 +12,14 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
+/**
+ * Class helps to mock the response of AppRetrofitImpl
+ * @property isGetApiCalled Boolean helps to get data if get method is called
+ * @property isPostApiCalled Boolean helps to get data if post method is called
+ * @property isPutApiCalled Boolean helps to get data if put method is called
+ * @property isPatchApiCalled Boolean helps to get data if patch method is called
+ * @property isDeleteApiCalled Boolean helps to get data if delete method is called
+ */
 class MockAppRetrofitImpl:AppRetrofit {
 
     var isGetApiCalled = false
