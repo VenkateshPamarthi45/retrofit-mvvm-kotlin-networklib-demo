@@ -4,7 +4,7 @@
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <application
-            android:name=".AppApplication"
+            android:name=".LibAppApplication"
             android:usesCleartextTraffic="true"
             android:networkSecurityConfig="@xml/network_security_config"
     >
