@@ -13,7 +13,7 @@ import retrofit2.Response
  * @property appRetrofit AppRetrofit
  * @constructor
  */
-internal class ModelManagerImpl(private val lruCacheManager: LruCacheManager, private val appRetrofit: AppRetrofit) : ModelManager {
+class ModelManagerImpl(private val lruCacheManager: LruCacheManager, private val appRetrofit: AppRetrofit) : ModelManager {
 
     /**
      * This function checks if data exists in cache layer if not it makes get request from network layer
@@ -22,21 +22,30 @@ internal class ModelManagerImpl(private val lruCacheManager: LruCacheManager, pr
      * @param url String this is http url api endpoint
      * @param closure Function3<[@kotlin.ParameterName] Response<ResponseBody>?, [@kotlin.ParameterName] ResponseBody?, [@kotlin.ParameterName] Deferred<Response<ResponseBody>>?, Unit>
      */
-    override fun getRequest(url: String, closure: (response: Response<ResponseBody>?, responseBody: ResponseBody?, call: Deferred<Response<ResponseBody>>?) -> Unit) {
+    override fun getRequest(url: String, closure: (response: Response<ResponseBody>?, inputStream: String?,isCacheAvailable:Boolean, call: Deferred<Response<ResponseBody>>?) -> Unit) {
         val cacheValue = lruCacheManager.getEntry(url)
         if(cacheValue == null){
+            println("cache is null so calling api")
+
             appRetrofit.getApiRequest(url){ response, call ->
                 if( response != null && response.isSuccessful){
-                    closure(response, response.body(), call)
-                    if(response.body() != null){
-                        lruCacheManager.putEntry(url, response.body()!!)
+                    val responseBody = response.body()
+                    if(responseBody != null){
+                        var responseBodyString = responseBody.string()
+                        if(url == "https://pastebin.com/raw/wgkJgazE"){
+                            lruCacheManager.putEntry(url,responseBodyString)
+                        }
+                        closure(response, responseBodyString,false, call)
+                    }else{
+                        closure(response, null, false,call)
                     }
                 }else{
-                    closure(response, null, call)
+                    closure(response, null, false, call)
                 }
             }
         }else{
-            closure(null, cacheValue as ResponseBody?, null)
+            println("getting data from cache " + cacheValue)
+            closure(null, cacheValue, true, null)
         }
     }
 

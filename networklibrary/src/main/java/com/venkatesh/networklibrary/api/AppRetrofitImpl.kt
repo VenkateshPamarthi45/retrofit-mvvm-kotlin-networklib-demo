@@ -7,8 +7,9 @@ import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import kotlin.coroutines.CoroutineContext as CoroutineContext1
+
+
 
 /**
  * Class helps to get data from server
@@ -16,7 +17,7 @@ import kotlin.coroutines.CoroutineContext as CoroutineContext1
  * @property retrofit Retrofit
  * @property service ApiService
  */
-internal class AppRetrofitImpl: AppRetrofit {
+class AppRetrofitImpl: AppRetrofit {
 
     companion object {
         val instance = AppRetrofitImpl()
@@ -30,7 +31,8 @@ internal class AppRetrofitImpl: AppRetrofit {
             .client(OkHttpClient.Builder().build())
             .baseUrl(BASE_URL)
             .addCallAdapterFactory(CoroutineCallAdapterFactory())
-            .addConverterFactory(GsonConverterFactory.create())
+            //.addConverterFactory(ScalarsConverterFactory.create())
+            //.addConverterFactory(GsonConverterFactory.create(gson))
             .build()
         service = retrofit.create(ApiService::class.java)
     }

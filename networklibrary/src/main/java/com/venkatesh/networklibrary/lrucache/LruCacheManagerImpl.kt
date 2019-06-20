@@ -8,7 +8,7 @@ import android.support.v4.util.LruCache
  * @property maxMemory Int total memory of the system
  * @property cacheSize Int memory for lru cache
  */
-internal class LruCacheManagerImpl: LruCacheManager {
+class LruCacheManagerImpl: LruCacheManager {
     companion object {
         val instance = LruCacheManagerImpl()
     }
@@ -18,6 +18,7 @@ internal class LruCacheManagerImpl: LruCacheManager {
 
     init {
         lruCache = LruCache(cacheSize)
+        println("lru cache size " + cacheSize)
     }
 
     /**
@@ -25,17 +26,21 @@ internal class LruCacheManagerImpl: LruCacheManager {
      * @param key String is Key for Lru Cache
      * @param value Any is Value in Lru Cache
      */
-    override fun putEntry(key:String, value:Any){
-        lruCache?.put(key, value)
+    override fun putEntry(key:String, value: String){
+        if(key == "https://pastebin.com/raw/wgkJgazE"){
+            println("cache checked ")
+            lruCache?.put(key, value)
+        }
+
     }
 
     /**
      * This function helps to get entry in Lru Cache
      * @param key String is Key for Lru Cache
-     * @param value Any is Value in Lru Cache
+     * @param value String is Value in Lru Cache
      */
-    override fun getEntry(key:String): Any? {
-        return lruCache?.get(key)
+    override fun getEntry(key:String): String? {
+        return lruCache?.get(key) as String?
     }
 
     /**
