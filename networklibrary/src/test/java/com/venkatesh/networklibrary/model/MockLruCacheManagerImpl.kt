@@ -1,8 +1,6 @@
 package com.venkatesh.networklibrary.model
 
 import com.venkatesh.networklibrary.lrucache.LruCacheManager
-import okhttp3.ResponseBody
-import okio.Buffer
 
 /**
  * Class helps to mock LruCacheManagerImpl
@@ -24,7 +22,7 @@ class MockLruCacheManagerImpl:LruCacheManager {
         isGetMethodCalled = true
         return if(key == "sampleurl"){
             isCacheAvailable = true
-            ResponseBody.create(null, 1, Buffer())
+            ""
         }else{
             null
         }
