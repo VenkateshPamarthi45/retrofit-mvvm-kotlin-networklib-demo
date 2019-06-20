@@ -1,7 +1,7 @@
 package com.venkatesh.networklibrary.lrucache
 
 interface LruCacheManager {
-    fun putEntry(key:String, value: String)
-    fun getEntry(key:String): String?
+    fun putEntry(key:String, value: Any)
+    fun getEntry(key:String): Any?
     fun getSnapShotOfCache(): String
 }

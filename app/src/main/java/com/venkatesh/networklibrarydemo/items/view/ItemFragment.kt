@@ -14,16 +14,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import com.venkatesh.networklibrary.model.ModelManager
-import com.venkatesh.networklibrarydemo.R
-import com.venkatesh.networklibrarydemo.items.adapter.ItemRecyclerViewAdapter
 import com.venkatesh.networklibrarydemo.common.LiveDataResource
 import com.venkatesh.networklibrarydemo.common.isNetworkAvailable
+import com.venkatesh.networklibrarydemo.items.adapter.ItemRecyclerViewAdapter
 import com.venkatesh.networklibrarydemo.items.repository.model.Item
 import com.venkatesh.networklibrarydemo.items.viewmodel.ItemViewModel
 import com.venkatesh.networklibrarydemo.items.viewmodel.ItemsViewModelFactory
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.support.kodein
 import org.kodein.di.generic.instance
+
+
 
 private lateinit var countingIdlingResource: CountingIdlingResource
 
@@ -54,18 +55,18 @@ class ItemListingFragment : Fragment(),KodeinAware {
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_item_list, container, false)
+        val view = inflater.inflate(com.venkatesh.networklibrarydemo.R.layout.fragment_item_list, container, false)
 
-        recyclerView = view.findViewById(R.id.recyclerView)
-        moreProgressBar = view.findViewById(R.id.moreProgressBar)
-        progressBar = view.findViewById(R.id.progressBar)
+        recyclerView = view.findViewById(com.venkatesh.networklibrarydemo.R.id.recyclerView)
+        moreProgressBar = view.findViewById(com.venkatesh.networklibrarydemo.R.id.moreProgressBar)
+        progressBar = view.findViewById(com.venkatesh.networklibrarydemo.R.id.progressBar)
 
-        errorImageView = view.findViewById(R.id.errorImageView)
-        errorTextView = view.findViewById(R.id.errorMessageTextView)
-        errorButton = view.findViewById(R.id.errorCaseButton)
+        errorImageView = view.findViewById(com.venkatesh.networklibrarydemo.R.id.errorImageView)
+        errorTextView = view.findViewById(com.venkatesh.networklibrarydemo.R.id.errorMessageTextView)
+        errorButton = view.findViewById(com.venkatesh.networklibrarydemo.R.id.errorCaseButton)
 
-        swipeRefreshingLayout = view.findViewById(R.id.swipe_refreshing_layout)
-        gridLayoutManager = GridLayoutManager(view.context, resources.getInteger(R.integer.items_columns), LinearLayoutManager.VERTICAL, false)
+        swipeRefreshingLayout = view.findViewById(com.venkatesh.networklibrarydemo.R.id.swipe_refreshing_layout)
+        gridLayoutManager = GridLayoutManager(view.context, resources.getInteger(com.venkatesh.networklibrarydemo.R.integer.items_columns), LinearLayoutManager.VERTICAL, false)
         recyclerView.layoutManager = gridLayoutManager
         countingIdlingResource = CountingIdlingResource(TAG)
 
@@ -77,9 +78,9 @@ class ItemListingFragment : Fragment(),KodeinAware {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if(savedInstanceState != null){
-            startIndex = savedInstanceState.getInt(getString(R.string.key_start_index))
-            val pastItems = savedInstanceState.getInt(getString(R.string.key_recyclerview_position))
-            totalCount = savedInstanceState.getInt(getString(R.string.key_total_count))
+            startIndex = savedInstanceState.getInt(getString(com.venkatesh.networklibrarydemo.R.string.key_start_index))
+            val pastItems = savedInstanceState.getInt(getString(com.venkatesh.networklibrarydemo.R.string.key_recyclerview_position))
+            totalCount = savedInstanceState.getInt(getString(com.venkatesh.networklibrarydemo.R.string.key_total_count))
             items = viewModel.savedItems
             setRecyclerViewAdapterWithData(items!!)
             recyclerView.scrollToPosition(pastItems)
@@ -91,9 +92,9 @@ class ItemListingFragment : Fragment(),KodeinAware {
     override fun onSaveInstanceState(@NonNull outState: Bundle) {
         super.onSaveInstanceState(outState)
         if (itemRecyclerViewAdapter != null) {
-            outState.putInt(getString(R.string.key_recyclerview_position), gridLayoutManager.findLastVisibleItemPosition())
-            outState.putInt(getString(R.string.key_start_index), startIndex)
-            outState.putInt(getString(R.string.key_total_count), totalCount)
+            outState.putInt(getString(com.venkatesh.networklibrarydemo.R.string.key_recyclerview_position), gridLayoutManager.findLastVisibleItemPosition())
+            outState.putInt(getString(com.venkatesh.networklibrarydemo.R.string.key_start_index), startIndex)
+            outState.putInt(getString(com.venkatesh.networklibrarydemo.R.string.key_total_count), totalCount)
             viewModel.savedItems = items
         }
     }
@@ -160,16 +161,16 @@ class ItemListingFragment : Fragment(),KodeinAware {
     private fun handlingNoNetworkCase() {
         if (startIndex == 0) {
             errorButton.visibility = View.VISIBLE
-            errorButton.text = (getString(R.string.retry))
-            errorTextView.text = getString(R.string.no_internet_connection)
+            errorButton.text = (getString(com.venkatesh.networklibrarydemo.R.string.retry))
+            errorTextView.text = getString(com.venkatesh.networklibrarydemo.R.string.no_internet_connection)
             errorTextView.visibility = View.VISIBLE
-            errorImageView.setBackgroundResource(R.drawable.ic_signal_wifi_off)
+            errorImageView.setBackgroundResource(com.venkatesh.networklibrarydemo.R.drawable.ic_signal_wifi_off)
             errorImageView.visibility = View.VISIBLE
             errorButton.setOnClickListener {
                 makePaginationApi()
             }
         }else{
-            Snackbar.make(view!!,getString(R.string.no_internet_connection),Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(view!!,getString(com.venkatesh.networklibrarydemo.R.string.no_internet_connection),Snackbar.LENGTH_SHORT).show()
         }
     }
 
@@ -234,7 +235,11 @@ class ItemListingFragment : Fragment(),KodeinAware {
         } else {
             itemRecyclerViewAdapter?.addAllItems(listOfItems)
             items?.addAll(listOfItems)
-            itemRecyclerViewAdapter?.notifyDataSetChanged()
+            recyclerView.post {
+                // There is no need to use notifyDataSetChanged()
+                itemRecyclerViewAdapter?.notifyDataSetChanged()
+            }
+
         }
     }
 

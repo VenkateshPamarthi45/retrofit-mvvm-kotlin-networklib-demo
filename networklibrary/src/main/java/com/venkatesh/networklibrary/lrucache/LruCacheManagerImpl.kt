@@ -26,21 +26,17 @@ class LruCacheManagerImpl: LruCacheManager {
      * @param key String is Key for Lru Cache
      * @param value Any is Value in Lru Cache
      */
-    override fun putEntry(key:String, value: String){
-        if(key == "https://pastebin.com/raw/wgkJgazE"){
-            println("cache checked ")
-            lruCache?.put(key, value)
-        }
-
+    override fun putEntry(key:String, value: Any){
+        lruCache?.put(key, value)
     }
 
     /**
      * This function helps to get entry in Lru Cache
      * @param key String is Key for Lru Cache
-     * @param value String is Value in Lru Cache
+     * @param value Any is Value in Lru Cache
      */
-    override fun getEntry(key:String): String? {
-        return lruCache?.get(key) as String?
+    override fun getEntry(key:String): Any? {
+        return lruCache?.get(key)
     }
 
     /**

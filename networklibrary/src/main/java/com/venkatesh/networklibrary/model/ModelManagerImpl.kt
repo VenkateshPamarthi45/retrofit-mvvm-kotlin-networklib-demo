@@ -6,6 +6,7 @@ import kotlinx.coroutines.Deferred
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Response
+import java.io.InputStream
 
 /**
  * Class helps client to get data from network layer or Cache layer
@@ -14,6 +15,36 @@ import retrofit2.Response
  * @constructor
  */
 class ModelManagerImpl(private val lruCacheManager: LruCacheManager, private val appRetrofit: AppRetrofit) : ModelManager {
+
+    /**
+     *
+     * @param url String
+     * @param closure Function3<[@kotlin.ParameterName] Response<ResponseBody>?, [@kotlin.ParameterName] ResponseBody?, [@kotlin.ParameterName] Deferred<Response<ResponseBody>>?, Unit>
+     */
+    override fun getRequestForImage(
+        url: String,
+        closure: (response: Response<ResponseBody>?, inputStream: InputStream?, call: Deferred<Response<ResponseBody>>?) -> Unit
+    ) {
+        val cacheValue = lruCacheManager.getEntry(url) as InputStream?
+        if(cacheValue != null && cacheValue.readBytes().isNotEmpty()){
+            closure(null, cacheValue, null)
+        }else{
+            appRetrofit.getApiRequest(url){ response, call ->
+                if( response != null && response.isSuccessful){
+                    val responseBody = response.body()
+                    if(responseBody != null){
+                        val inputStream = responseBody.byteStream()
+                        lruCacheManager.putEntry(url, inputStream)
+                        closure(response, inputStream, call)
+                    }else{
+                        closure(response, null,call)
+                    }
+                }else{
+                    closure(response, null, call)
+                }
+            }
+        }
+    }
 
     /**
      * This function checks if data exists in cache layer if not it makes get request from network layer
@@ -25,16 +56,12 @@ class ModelManagerImpl(private val lruCacheManager: LruCacheManager, private val
     override fun getRequest(url: String, closure: (response: Response<ResponseBody>?, inputStream: String?,isCacheAvailable:Boolean, call: Deferred<Response<ResponseBody>>?) -> Unit) {
         val cacheValue = lruCacheManager.getEntry(url)
         if(cacheValue == null){
-            println("cache is null so calling api")
-
             appRetrofit.getApiRequest(url){ response, call ->
                 if( response != null && response.isSuccessful){
                     val responseBody = response.body()
                     if(responseBody != null){
-                        var responseBodyString = responseBody.string()
-                        if(url == "https://pastebin.com/raw/wgkJgazE"){
-                            lruCacheManager.putEntry(url,responseBodyString)
-                        }
+                        val responseBodyString = responseBody.string()
+                        lruCacheManager.putEntry(url,responseBodyString)
                         closure(response, responseBodyString,false, call)
                     }else{
                         closure(response, null, false,call)
@@ -44,8 +71,7 @@ class ModelManagerImpl(private val lruCacheManager: LruCacheManager, private val
                 }
             }
         }else{
-            println("getting data from cache " + cacheValue)
-            closure(null, cacheValue, true, null)
+            closure(null, cacheValue as @kotlin.ParameterName(name = "inputStream") String, true, null)
         }
     }
 

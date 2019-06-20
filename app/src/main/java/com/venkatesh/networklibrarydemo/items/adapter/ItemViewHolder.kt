@@ -3,11 +3,11 @@ package com.venkatesh.networklibrarydemo.items.adapter
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.widget.ImageView
-import com.venkatesh.networklibrary.createBitMapFromString
+import com.venkatesh.networklibrary.createBitMapFromResponseBody
 import com.venkatesh.networklibrary.model.ModelManager
-import com.venkatesh.networklibrarydemo.items.view.ItemListingFragment
 import com.venkatesh.networklibrarydemo.R
 import com.venkatesh.networklibrarydemo.items.repository.model.Item
+import com.venkatesh.networklibrarydemo.items.view.ItemListingFragment
 
 /**
  * Class extends [RecyclerView.ViewHolder]
@@ -18,6 +18,13 @@ class ItemViewHolder(itemView: View, listener: ItemListingFragment.OnWatchlistIt
 
     private var item: Item? = null
     private var imageView: ImageView = itemView.findViewById(R.id.imageView)
+    init {
+        imageView.setOnClickListener {
+            listener.onListClickInteraction(
+                item!!, ""
+            )
+        }
+    }
 
     /**
      * In this method, the views are updated with data
@@ -25,11 +32,10 @@ class ItemViewHolder(itemView: View, listener: ItemListingFragment.OnWatchlistIt
      */
     fun setItem(item: Item ) {
         this.item = item
-        modelManager?.getRequest(item.urls.regular){
-            response, responseString,isCacheAvailable, call ->
-            if(responseString != null){
-                println("image decode from response body")
-                imageView.createBitMapFromString(responseString)
+        modelManager?.getRequestForImage(item.urls.regular){
+            response, responseBody, call ->
+            if(responseBody != null){
+                imageView.createBitMapFromResponseBody(responseBody)
             }
         }
     }

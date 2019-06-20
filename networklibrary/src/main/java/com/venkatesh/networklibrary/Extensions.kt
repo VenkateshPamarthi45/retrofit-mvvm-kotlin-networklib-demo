@@ -2,7 +2,6 @@ package com.venkatesh.networklibrary
 
 import android.graphics.BitmapFactory
 import android.widget.ImageView
-import okhttp3.ResponseBody
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 
@@ -12,10 +11,10 @@ import java.io.InputStream
  * @receiver ImageView
  * @param responseBody ResponseBody?
  */
-fun ImageView.createBitMapFromResponseBody(inputStream: ResponseBody?) {
+fun ImageView.createBitMapFromResponseBody(inputStream: InputStream?) {
     if(inputStream != null){
-        println("image decode extension " + inputStream)
-        setImageBitmap(BitmapFactory.decodeStream(inputStream.byteStream()))
+        println("input stream " + inputStream)
+        setImageBitmap(BitmapFactory.decodeStream(inputStream))
     }
 }
 
