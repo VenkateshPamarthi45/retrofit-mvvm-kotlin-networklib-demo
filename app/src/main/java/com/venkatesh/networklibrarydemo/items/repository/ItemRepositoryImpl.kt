@@ -20,23 +20,19 @@ class ItemRepositoryImpl(var modelManager: ModelManager):ItemRepository {
      */
     override fun getItems(pageId: String, closure: (liveDataSource:LiveDataResource<List<Item>>) -> Unit) {
 
-        modelManager.getRequest(pageId){ response, inputStream, isCacheAvailable, call ->
-            if(inputStream == null && response == null && call != null){
+        modelManager.getRequest(pageId){ response, responseBodyString,  call ->
+            if(responseBodyString == null && response == null && call != null){
                 println(" call is not null")
                 closure(LiveDataResource.loading(null, call))
-            } else if(inputStream != null){
-                println("inputStream is not null")
+            } else if(responseBodyString != null){
+                println("responseBodyString is not null")
                 val token = object : TypeToken<List<Item>>() {}
                 var items = emptyList<Item>()
-                items = if(isCacheAvailable){
-                    Gson().fromJson(inputStream, token.type)
-                }else{
-                    Gson().fromJson(inputStream, token.type)
-                }
+                items = Gson().fromJson(responseBodyString, token.type)
                 val statusCode = response?.code() ?: 0
                 closure(LiveDataResource.success(statusCode,items, call))
             }else if(response != null){
-                println("inputStream is null")
+                println("responseBodyString is null")
                 closure(LiveDataResource.error(response.code(), response.message(), null, call))
             }else{
                 println(" response is null")

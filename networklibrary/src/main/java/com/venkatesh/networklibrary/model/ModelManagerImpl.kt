@@ -53,7 +53,7 @@ class ModelManagerImpl(private val lruCacheManager: LruCacheManager, private val
      * @param url String this is http url api endpoint
      * @param closure Function3<[@kotlin.ParameterName] Response<ResponseBody>?, [@kotlin.ParameterName] ResponseBody?, [@kotlin.ParameterName] Deferred<Response<ResponseBody>>?, Unit>
      */
-    override fun getRequest(url: String, closure: (response: Response<ResponseBody>?, inputStream: String?,isCacheAvailable:Boolean, call: Deferred<Response<ResponseBody>>?) -> Unit) {
+    override fun getRequest(url: String, closure: (response: Response<ResponseBody>?, inputStream: String?, call: Deferred<Response<ResponseBody>>?) -> Unit) {
         val cacheValue = lruCacheManager.getEntry(url)
         if(cacheValue == null){
             appRetrofit.getApiRequest(url){ response, call ->
@@ -62,16 +62,16 @@ class ModelManagerImpl(private val lruCacheManager: LruCacheManager, private val
                     if(responseBody != null){
                         val responseBodyString = responseBody.string()
                         lruCacheManager.putEntry(url,responseBodyString)
-                        closure(response, responseBodyString,false, call)
+                        closure(response, responseBodyString, call)
                     }else{
-                        closure(response, null, false,call)
+                        closure(response, null,call)
                     }
                 }else{
-                    closure(response, null, false, call)
+                    closure(response, null, call)
                 }
             }
         }else{
-            closure(null, cacheValue as @kotlin.ParameterName(name = "inputStream") String, true, null)
+            closure(null, cacheValue as @kotlin.ParameterName(name = "inputStream") String, null)
         }
     }
 
