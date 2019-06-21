@@ -20,6 +20,7 @@ class ItemRepositoryImpl(var modelManager: ModelManager):ItemRepository {
      */
     override fun getItems(pageId: String, closure: (liveDataSource:LiveDataResource<List<Item>>) -> Unit) {
 
+
         modelManager.getRequest(pageId){ response, responseBodyString,  call ->
             if(responseBodyString == null && response == null && call != null){
                 println(" call is not null")

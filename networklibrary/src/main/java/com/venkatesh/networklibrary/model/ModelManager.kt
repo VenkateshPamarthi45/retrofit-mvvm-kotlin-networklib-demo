@@ -16,4 +16,6 @@ interface ModelManager {
     fun putRequest(url:String, requestBody: RequestBody, closure: (response: Response<ResponseBody>?, call: Deferred<Response<ResponseBody>>) -> Unit)
     fun patchRequest(url:String, requestBody: RequestBody, closure: (response: Response<ResponseBody>?, call: Deferred<Response<ResponseBody>>) -> Unit)
     fun deleteApiRequest(url:String, closure: (response: Response<ResponseBody>?, call: Deferred<Response<ResponseBody>>) -> Unit)
+    fun writeFileOnDiskFromResponseBody(responseBody: ResponseBody, fileName: String):Boolean
+    fun downloadFile(url:String,fileName:String, closure: (isFileDownloaded: Boolean, call: Deferred<Response<ResponseBody>>) -> Unit)
 }

@@ -22,11 +22,19 @@ import retrofit2.converter.gson.GsonConverterFactory
  */
 class MockAppRetrofitImpl:AppRetrofit {
 
+
     var isGetApiCalled = false
     var isPostApiCalled = false
     var isPutApiCalled = false
     var isPatchApiCalled = false
     var isDeleteApiCalled = false
+
+    override fun downloadFile(
+        url: String,
+        closure: (response: Response<ResponseBody>?, call: Deferred<Response<ResponseBody>>) -> Unit
+    ) {
+
+    }
 
     override fun getApiRequest(
         url: String,

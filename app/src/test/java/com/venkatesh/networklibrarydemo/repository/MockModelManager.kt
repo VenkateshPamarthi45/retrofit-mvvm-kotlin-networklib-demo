@@ -9,6 +9,20 @@ import java.io.InputStream
 
 class MockModelManager:ModelManager {
 
+
+    override fun writeFileOnDiskFromResponseBody(responseBody: ResponseBody, fileName: String): Boolean {
+        return false
+    }
+
+    override fun downloadFile(
+        url: String,
+        fileName: String,
+        closure: (isFileDownloaded: Boolean, call: Deferred<Response<ResponseBody>>) -> Unit
+    ) {
+
+    }
+
+
     var isGetRequestMethodIsCalled = false
 
     override fun getRequest(

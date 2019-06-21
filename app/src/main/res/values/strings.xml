@@ -7,4 +7,6 @@
     <string name="key_recyclerview_position">recyclerViewPosition</string>
     <string name="key_total_count">totalCount</string>
     <string name="api_key">xxx</string>
+    <string name="sample_download_url">https://image.tmdb.org/t/p/original/aQXTw3wIWuFMy0beXRiZ1xVKtcf.jpg</string>
+    <string name="file_downloaded">File Downloaded</string>
 </resources>
