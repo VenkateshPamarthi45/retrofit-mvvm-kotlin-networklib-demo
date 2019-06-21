@@ -10,6 +10,10 @@ internal interface ApiService {
     @GET
     fun getApiAsync(@Url url: String): Deferred<Response<ResponseBody>>
 
+    @GET
+    @Streaming
+    fun downloadFile(@Url url: String): Deferred<Response<ResponseBody>>
+
     @POST
     fun postApiAsync(@Url url: String, @Body body: RequestBody): Deferred<Response<ResponseBody>>
 

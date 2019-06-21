@@ -1,25 +1,34 @@
 package com.venkatesh.networklibrarydemo.items.view
 
+import android.app.Activity
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.annotation.NonNull
 import android.support.design.widget.Snackbar
 import android.support.test.espresso.idling.CountingIdlingResource
 import android.support.v4.app.Fragment
-import android.support.v4.widget.SwipeRefreshLayout
-import android.support.v7.widget.*
+import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ProgressBar
+import android.widget.Toast
 import com.venkatesh.networklibrary.model.ModelManager
+import com.venkatesh.networklibrarydemo.R
 import com.venkatesh.networklibrarydemo.common.LiveDataResource
 import com.venkatesh.networklibrarydemo.common.isNetworkAvailable
+import com.venkatesh.networklibrarydemo.common.isWritePermissionsGiven
+import com.venkatesh.networklibrarydemo.databinding.ErrorCaseBinding
+import com.venkatesh.networklibrarydemo.databinding.FragmentItemListBinding
 import com.venkatesh.networklibrarydemo.items.adapter.ItemRecyclerViewAdapter
 import com.venkatesh.networklibrarydemo.items.repository.model.Item
 import com.venkatesh.networklibrarydemo.items.viewmodel.ItemViewModel
 import com.venkatesh.networklibrarydemo.items.viewmodel.ItemsViewModelFactory
+import kotlinx.android.synthetic.main.error_case.*
+import kotlinx.android.synthetic.main.fragment_item_list.*
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.support.kodein
 import org.kodein.di.generic.instance
@@ -41,38 +50,25 @@ class ItemListingFragment : Fragment(),KodeinAware {
 
     private var startIndex = 0
     private var isLoading = false
-    private lateinit var moreProgressBar: ProgressBar
-    private lateinit var progressBar: ProgressBar
     private var itemRecyclerViewAdapter : ItemRecyclerViewAdapter? = null
-    private lateinit var recyclerView : RecyclerView
+
     private lateinit var gridLayoutManager: GridLayoutManager
-    private lateinit var swipeRefreshingLayout: SwipeRefreshLayout
-    private lateinit var errorImageView: AppCompatImageView
-    private lateinit var errorTextView: AppCompatTextView
-    private lateinit var errorButton: AppCompatButton
     private var totalCount:Int = 0
     private var items : MutableList<Item>? = null
-
+    private lateinit var listItemBinding:FragmentItemListBinding
+    private lateinit var errorCaseBinding: ErrorCaseBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(com.venkatesh.networklibrarydemo.R.layout.fragment_item_list, container, false)
-
-        recyclerView = view.findViewById(com.venkatesh.networklibrarydemo.R.id.recyclerView)
-        moreProgressBar = view.findViewById(com.venkatesh.networklibrarydemo.R.id.moreProgressBar)
-        progressBar = view.findViewById(com.venkatesh.networklibrarydemo.R.id.progressBar)
-
-        errorImageView = view.findViewById(com.venkatesh.networklibrarydemo.R.id.errorImageView)
-        errorTextView = view.findViewById(com.venkatesh.networklibrarydemo.R.id.errorMessageTextView)
-        errorButton = view.findViewById(com.venkatesh.networklibrarydemo.R.id.errorCaseButton)
-
-        swipeRefreshingLayout = view.findViewById(com.venkatesh.networklibrarydemo.R.id.swipe_refreshing_layout)
-        gridLayoutManager = GridLayoutManager(view.context, resources.getInteger(com.venkatesh.networklibrarydemo.R.integer.items_columns), LinearLayoutManager.VERTICAL, false)
-        recyclerView.layoutManager = gridLayoutManager
+        val view = inflater.inflate(R.layout.fragment_item_list, container, false)
+        listItemBinding = FragmentItemListBinding.inflate(layoutInflater, container, false)
+        errorCaseBinding = ErrorCaseBinding.inflate(layoutInflater, container, false)
+        gridLayoutManager = GridLayoutManager(view.context, resources.getInteger(R.integer.items_columns), LinearLayoutManager.VERTICAL, false)
+        listItemBinding.recyclerView.layoutManager = gridLayoutManager
         countingIdlingResource = CountingIdlingResource(TAG)
 
         setRecyclerViewScrollListener()
         swipeRefreshingLayoutListener()
-        return view
+        return listItemBinding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -83,12 +79,43 @@ class ItemListingFragment : Fragment(),KodeinAware {
             totalCount = savedInstanceState.getInt(getString(com.venkatesh.networklibrarydemo.R.string.key_total_count))
             items = viewModel.savedItems
             setRecyclerViewAdapterWithData(items!!)
-            recyclerView.scrollToPosition(pastItems)
+            listItemBinding.recyclerView.scrollToPosition(pastItems)
         }else{
             makePaginationApi()
         }
     }
 
+    override fun onAttach(activity: Activity?) {
+        super.onAttach(activity)
+        if(activity!= null && activity.isWritePermissionsGiven()){
+            downloadFileFromServer()
+        }
+    }
+
+    private fun downloadFileFromServer() {
+        modelManager.downloadFile(
+            getString(R.string.sample_download_url),
+            "asdadz.jpg"
+        ) { isFileDownloaded, call ->
+            if(isFileDownloaded){
+                Toast.makeText(context!!, getString(R.string.file_downloaded), Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    override fun onRequestPermissionsResult(permsRequestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+
+        when (permsRequestCode) {
+
+            100 -> {
+                val isPermissionGranted = grantResults[0] == PackageManager.PERMISSION_GRANTED
+                if (isPermissionGranted) {
+                    downloadFileFromServer()
+                }
+            }
+        }
+
+    }
     override fun onSaveInstanceState(@NonNull outState: Bundle) {
         super.onSaveInstanceState(outState)
         if (itemRecyclerViewAdapter != null) {
@@ -107,7 +134,7 @@ class ItemListingFragment : Fragment(),KodeinAware {
      * @makePaginationApi method
      */
     private fun setRecyclerViewScrollListener(){
-        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        listItemBinding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 val totalItems = recyclerView.layoutManager?.itemCount
@@ -131,7 +158,7 @@ class ItemListingFragment : Fragment(),KodeinAware {
      * @makePaginationApi method
      */
     private fun swipeRefreshingLayoutListener(){
-        swipeRefreshingLayout.setOnRefreshListener {
+        listItemBinding.swipeRefreshingLayout.setOnRefreshListener {
             startIndex = 0
             itemRecyclerViewAdapter = null
             makePaginationApi()
@@ -143,7 +170,6 @@ class ItemListingFragment : Fragment(),KodeinAware {
      * @getItemsFromViewModel method or
      */
     fun makePaginationApi(){
-        println("make pagination api start index " + startIndex)
         if(startIndex != 0){
             moreProgressBar.visibility = View.VISIBLE
         }else{
@@ -160,13 +186,13 @@ class ItemListingFragment : Fragment(),KodeinAware {
      */
     private fun handlingNoNetworkCase() {
         if (startIndex == 0) {
-            errorButton.visibility = View.VISIBLE
-            errorButton.text = (getString(com.venkatesh.networklibrarydemo.R.string.retry))
-            errorTextView.text = getString(com.venkatesh.networklibrarydemo.R.string.no_internet_connection)
-            errorTextView.visibility = View.VISIBLE
+            errorCaseBinding.errorCaseButton.visibility = View.VISIBLE
+            errorCaseBinding.errorCaseButton.text = (getString(com.venkatesh.networklibrarydemo.R.string.retry))
+            errorCaseBinding.errorMessageTextView.text = getString(com.venkatesh.networklibrarydemo.R.string.no_internet_connection)
+            errorCaseBinding.errorMessageTextView.visibility = View.VISIBLE
             errorImageView.setBackgroundResource(com.venkatesh.networklibrarydemo.R.drawable.ic_signal_wifi_off)
             errorImageView.visibility = View.VISIBLE
-            errorButton.setOnClickListener {
+            errorCaseBinding.errorCaseButton.setOnClickListener {
                 makePaginationApi()
             }
         }else{
@@ -181,8 +207,8 @@ class ItemListingFragment : Fragment(),KodeinAware {
      * [errorTextView] visibility gone
      */
     private fun dismissErrorViews() {
-        errorButton.visibility = View.GONE
-        errorTextView.visibility = View.GONE
+        errorCaseBinding.errorCaseButton.visibility = View.GONE
+        errorCaseBinding.errorMessageTextView.visibility = View.GONE
         errorImageView.visibility = View.GONE
         recyclerView.visibility = View.VISIBLE
     }
@@ -195,6 +221,7 @@ class ItemListingFragment : Fragment(),KodeinAware {
     private fun getItemsFromViewModel() {
         if (context != null && context!!.isNetworkAvailable()) {
             dismissErrorViews()
+            listItemBinding.progressBar.visibility = View.VISIBLE
             countingIdlingResource.increment()
             viewModel.getItems("https://pastebin.com/raw/wgkJgazE")?.observe(this, Observer {
                 dismissProgressBarViews()
@@ -202,12 +229,9 @@ class ItemListingFragment : Fragment(),KodeinAware {
                     countingIdlingResource.decrement()
                 }
                 if (it?.status == LiveDataResource.Status.SUCCESS && it.data != null && it.data.isNotEmpty()) {
-                    println("getItemsFromViewModel api start index  success" + startIndex)
                     totalCount = 100//it.data.pagination.total_count
                     val listOfItems = it.data.toMutableList()
                     setRecyclerViewAdapterWithData(listOfItems)
-                }else{
-                    println("getItemsFromViewModel api start index  error" + startIndex)
                 }
             })
         } else {
@@ -252,7 +276,7 @@ class ItemListingFragment : Fragment(),KodeinAware {
         isLoading = false
         progressBar.visibility = View.GONE
         moreProgressBar.visibility = View.GONE
-        swipeRefreshingLayout.isRefreshing = false
+        listItemBinding.swipeRefreshingLayout.isRefreshing = false
     }
 
     /**

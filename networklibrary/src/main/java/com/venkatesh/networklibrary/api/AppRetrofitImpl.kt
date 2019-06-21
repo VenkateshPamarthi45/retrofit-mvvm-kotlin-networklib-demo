@@ -19,6 +19,7 @@ import kotlin.coroutines.CoroutineContext as CoroutineContext1
  */
 class AppRetrofitImpl: AppRetrofit {
 
+
     companion object {
         val instance = AppRetrofitImpl()
     }
@@ -47,6 +48,18 @@ class AppRetrofitImpl: AppRetrofit {
         createCoroutineScopeForApiCall(apiCall, closure)
     }
 
+    /**
+     *
+     * @param url String
+     * @param closure Function2<[@kotlin.ParameterName] Response<ResponseBody>?, [@kotlin.ParameterName] Deferred<Response<ResponseBody>>, Unit>
+     */
+    override fun downloadFile(
+        url: String,
+        closure: (response: Response<ResponseBody>?, call: Deferred<Response<ResponseBody>>) -> Unit
+    ) {
+        val apiCall = service.downloadFile(url)
+        createCoroutineScopeForApiCall(apiCall, closure)
+    }
     /**
      * This function helps to send data via post method and fetches data from server
      * @param url String this is http url api endpoint
